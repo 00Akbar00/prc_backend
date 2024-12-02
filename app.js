@@ -4,16 +4,16 @@ require('dotenv').config();
 const PORT = process.env.PORT;
 const { sequelize } = require('./models');
 const router = express.Router();
+const sequelizeSync = require('./config/db');
+
 
 
 
 // Middleware
 app.use(express.json());
 
-sequelize.sync({ force: false }) // Use `force: true` to drop and recreate tables (use carefully!)
-  .then(() => console.log('Database synced.'))
-  .catch((err) => console.error('Database sync error:', err));
 
+sequelizeSync();
 
 app.listen(PORT, ()=>{
     console.log(`Server is running on port ${PORT}`);
