@@ -1,0 +1,11 @@
+{
+  "development": {
+    "username": "root",
+    "password": "Test@123",
+    "database": "test_project",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "port": 3306,
+    "logging": false
+  }
+}
