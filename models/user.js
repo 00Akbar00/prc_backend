@@ -13,18 +13,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     }
   }, {});
-
-  // Associations (if needed)
-  User.associate = function(models) {
-    // Define associations here
-  };
 
   return User;
 };

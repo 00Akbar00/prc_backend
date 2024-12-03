@@ -1,11 +1,11 @@
-const userModel = require('../models/user');
+const { User } = require('../models');  // Import the User model
 
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     // Find the user by email
-    let user = await userModel.findOne({ where: { email } });
+    let user = await User.findOne({ where: { email } });
 
     if (!user) {
       return res.json({
