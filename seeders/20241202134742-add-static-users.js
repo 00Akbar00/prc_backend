@@ -5,18 +5,22 @@ module.exports = {
     // Add static data
     return queryInterface.bulkInsert('Users', [
       {
-        name: 'John Doe',
-        email: 'john@example.com',
+        username: 'Akbar', // Changed from 'name' to 'username'
+        email: 'akbar@example.com',
+        password: '12345678', // Assuming you want to insert a password
+        isAdmin: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Jane Doe',
-        email: 'jane@example.com',
+        username: 'berry', // Changed from 'name' to 'username'
+        email: 'berry@example.com',
+        password: '123456789',
+        isAdmin: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-    ]);
+    ], {});
   },
 
   down: async (queryInterface, Sequelize) => {
