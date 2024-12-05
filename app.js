@@ -67,31 +67,45 @@ passport.deserializeUser(async (id, done) => {
 
 // Custom login route
 app.post('/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        if (err) {
-            return next(err);
-        }
-        if (!user) {
-            return res.status(400).json({ success: false, message: info.message || 'Login failed' });
-        }
-    
-        req.logIn(user, (err) => {
-            if (err) {
-                return next(err);
-            }
-    
-            // Send success flag and dashboard type
-            return res.status(200).json({
-                success: true,
-                message: 'Login successful',
-                dashboard: user.isAdmin ? 'admin' : 'user',  // Send either 'admin' or 'user' based on the user type
-                user: user
-            });
-        });
-    })(req, res, next);
-    
+  passport.authenticate('local', (err, user, info) => {
+    if (err) {
+      return next(err);  // Handle any unexpected errors
+    }
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: info?.message || 'Login failed. Please check your credentials.'
+      });
+    }
+
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);  // Handle any login errors
+      }
+
+      // Determine role based on user's status
+      const role = user.isAdmin ? 'admin' : 'user';
+
+      // Set the 'role' cookie (used by middleware)
+      res.cookie('dashboard', role, {
+        httpOnly: true,      // Prevent access by client-side JavaScript
+        secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+        sameSite: 'strict',  // Prevent cross-site requests
+        maxAge: 24 * 60 * 60 * 1000  // Cookie expiration: 1 day
+      });
+
+      // Send success response with role and other necessary info
+      return res.status(200).json({
+        success: true,
+        message: `Logged in as ${role}`,
+        role: role,   // Return the role variable
+        user: { id: user.id, username: user.username }  // Optionally send user info
+      });
+    });
+  })(req, res, next);
 });
 
+  
 // Define dashboard route (adminDash and userDash)
 app.get('/adminDash', (req, res) => {
     if (!req.user || !req.user.isAdmin) {
