@@ -9,4 +9,4 @@ const sequelizeSync = async () => {
   };
   
   module.exports = sequelizeSync;
-  
+    

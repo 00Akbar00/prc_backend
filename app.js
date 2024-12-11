@@ -10,6 +10,15 @@ const PORT = process.env.PORT;
 const cors = require("cors");
 const router = express.Router();
 
+
+const {
+  addUser,
+  deleteUser,
+  updateUser} = require('./controllers/userController');
+
+
+
+
 // Middleware
 app.use(express.json());
 const corsOptions = {
@@ -22,6 +31,8 @@ app.use(cors(corsOptions));
 // Set up session middleware for storing the user session
 app.use(session({
     secret: process.env.SESSION_SECRET || 'fallbackSecret', 
+    origin: 'http://localhost:3000', // Frontend URL
+    methods: ['GET', 'POST'],
     resave: false,
     saveUninitialized: false
 }));
@@ -127,13 +138,29 @@ app.get('/userDash', (req, res) => {
     });
 });
 
-// Logout route
-// app.get('/logout', (req, res) => {
-//     req.logout((err) => {
-//         if (err) return res.status(500).send('Error logging out');
-//         res.redirect('/');
-//     });
-// });
+//Logout route
+app.get('/logout', (req, res, next) => {
+  req.logout((err) => { 
+      if (err) {
+          // Pass the error to the error handler middleware
+          return next(err);
+      }
+
+      // Clear the cookies by setting their Max-Age to 0
+      res.clearCookie('user', { path: '/' });
+      res.clearCookie('role', { path: '/' });
+
+      // Redirect to the homepage or login page after logout
+      res.redirect('/');
+  });
+});
+
+// User Routes
+app.post("/add-user", addUser);       
+app.delete("/delete-user", deleteUser); 
+app.put("/update-user", updateUser);    
+
+
 
 sequelizeSync();
 
