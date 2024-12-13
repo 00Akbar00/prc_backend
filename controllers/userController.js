@@ -1,4 +1,4 @@
-const { Users } = require('../config/db'); // Adjust the path as needed
+const { User } = require('../config/db'); // Adjust the path as needed
 
 // Add User
 const addUser = async (req, res) => {

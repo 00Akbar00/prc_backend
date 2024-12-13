@@ -1,26 +1,14 @@
 module.exports = (sequelize, DataTypes) => {
-  const Department = sequelize.define('Department', {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+  const department = sequelize.define('department', {
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    slug: { type: DataTypes.STRING, allowNull: false },
   });
 
-  Department.associate = (models) => {
-    // One department has many users
-    Department.hasMany(models.User, {
-      foreignKey: 'departmentId',
-      as: 'users',
-    });
-
-    // One department has many permissions through DepartmentPermission
-    // Department.belongsToMany(models.Permission, {
-    //   through: models.DepartmentPermission,  // Specify the join table (model)
-    //   foreignKey: 'departmentId',
-    //   otherKey: 'permissionId',
-    //   as: 'permissions',  // Alias for the association
-    // });
+  department.associate = (models) => {
+    // Many-to-Many relationship with User through User_role
+    department.belongsToMany(models.user, { through: models.user_department, foreignKey: 'departmentId' });
   };
 
-  return Department;
+  return department;
 };

@@ -2,8 +2,8 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Insert some example users
-    await queryInterface.bulkInsert('Users', [
+    // Insert some example user
+    await queryInterface.bulkInsert('user', [
       {
         name: 'Akbar',
         email: 'akbar@example.com',
@@ -44,7 +44,7 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    // Delete the users if seeding is rolled back
-    await queryInterface.bulkDelete('Users', null, {});
+    // Delete the user if seeding is rolled back
+    await queryInterface.bulkDelete('user', null, {});
   },
 };

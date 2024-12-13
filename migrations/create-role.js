@@ -1,16 +1,18 @@
-// migrations/xxxxxx-create-role.js
-'use strict';
-
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Roles', {
+    await queryInterface.createTable('roles', {
       id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         autoIncrement: true,
         primaryKey: true,
+        allowNull: false,
       },
       name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      slug: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
@@ -27,6 +29,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Roles');
+    await queryInterface.dropTable('roles');
   },
 };
