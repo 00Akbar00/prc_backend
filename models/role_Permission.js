@@ -24,18 +24,18 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   
-  role_permission.associate = (models) => {
+  // role_permission.associate = (models) => {
     
-    role_permission.belongsTo(models.Role, {
-      foreignKey: 'roleId',
-      as: 'role',
-    });
+  //   role_permission.belongsTo(models.Role, {
+  //     foreignKey: 'roleId',
+  //     as: 'role',
+  //   });
 
-    role_permission.belongsTo(models.Permission, {
-      foreignKey: 'permissionId',
-      as: 'permission',
-    });
-  };
+  //   role_permission.belongsTo(models.Permission, {
+  //     foreignKey: 'permissionId',
+  //     as: 'permission',
+  //   });
+  // };
 
   return role_permission;
 };

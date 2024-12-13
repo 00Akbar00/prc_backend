@@ -1,41 +1,50 @@
-const { User } = require('../config/db'); // Adjust the path as needed
+const { user, role, department, user_role, user_department } = require('../models');
 
 // Add User
 const addUser = async (req, res) => {
   try {
-    const { name, email, password, departmentId, roleId } = req.body;
-   
+    const { name, email, password, roleId, departmentId } = req.body;
 
-    // Validate required fields
-    if (!name || !email || !password || !departmentId || !roleId) {
-      return res.status(400).json({ message: 'All fields (name, email, password, departmentId, roleId) are required.' });
+    // Basic validation
+    if (!name || !email || !password || !roleId || !departmentId) {
+      return res.status(400).json({ message: 'Name, email, password, roleId, and departmentId are required.' });
     }
 
-    // Check if email already exists
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(409).json({ message: 'Email already exists. Please use a different email.' });
-    }
+    // Create the user in the database without hashing the password
+    const newUser = await user.create({
+      name,
+      email,
+      password, // Using the raw password without hashing
+    });
 
-    // Create the new user
-    const user = await User.create({ name, email, password, departmentId, roleId });
+    // Assign role to the user
+    const userRole = await user_role.create({
+      userId: newUser.id,
+      roleId: roleId,
+    });
 
-    // Send success response
-    res.status(201).json({
-      message: 'User successfully created.',
+    // Assign department to the user
+    const userDepartment = await user_department.create({
+      userId: newUser.id,
+      departmentId: departmentId,
+    });
+
+    return res.status(201).json({
+      message: 'User created and assigned role and department successfully',
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        departmentId: user.departmentId,
-        roleId: user.roleId,
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
       },
+      role: userRole,
+      department: userDepartment,
     });
   } catch (error) {
-    // Handle unexpected errors
-    res.status(500).json({ message: 'An error occurred while creating the user.', error: error.message });
+    console.error(error);
+    return res.status(500).json({ message: 'An error occurred while creating the user and assigning role/department.' });
   }
 };
+
 
 // Create User
 const createUser = async (req, res) => {
