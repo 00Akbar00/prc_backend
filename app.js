@@ -14,8 +14,20 @@ const router = express.Router();
 const {
   addUser,
   deleteUser,
-  updateUser} = require('./controllers/userController');
+  updateUser
+} = require('./controllers/userController');
 
+const {
+  getDepartments,
+  addDepartment,
+  deleteDepartment
+} = require('./controllers/departmentController');
+
+const {
+  getRoles,
+  addRole,
+  deleteRole
+} = require('./controllers/roleController');
 
 
 
@@ -154,6 +166,17 @@ app.get('/logout', (req, res, next) => {
       res.redirect('/');
   });
 });
+
+
+// Role Routes
+app.get('/roles', getRoles);
+app.post('/addRole', addRole);
+app.delete('/deleteRole/:id', deleteRole);
+
+// Department Routes
+app.get('/departments', getDepartments);
+app.post('/addDepartment', addDepartment);
+app.delete('/deleteDepartment/:id', deleteDepartment);
 
 // User Routes
 app.post("/add-user", addUser);       

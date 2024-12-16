@@ -18,13 +18,13 @@
     "express-flash": "^0.0.2",
     "express-session": "^1.18.1",
     "mysql2": "^3.11.5",
-    "nodemon": "^3.1.7",
     "oauth": "^0.10.0",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "sequelize": "^6.37.5"
   },
   "devDependencies": {
+    "nodemon": "^3.1.9",
     "sequelize-cli": "^6.6.2"
   }
 }

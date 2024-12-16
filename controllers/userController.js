@@ -1,13 +1,22 @@
-const { user, role, department, user_role, user_department } = require('../models');
+const { user, user_role, user_department } = require('../models');
 
 // Add User
 const addUser = async (req, res) => {
   try {
-    const { name, email, password, roleId, departmentId } = req.body;
+    const { name, email, password, roleIds, departmentIds } = req.body;
 
     // Basic validation
-    if (!name || !email || !password || !roleId || !departmentId) {
-      return res.status(400).json({ message: 'Name, email, password, roleId, and departmentId are required.' });
+    if (!name || !email || !password || !roleIds || !departmentIds) {
+      return res
+        .status(400)
+        .json({ message: "Name, email, password, roleIds, and departmentIds are required." });
+    }
+
+    // Validate roleIds and departmentIds are arrays
+    if (!Array.isArray(roleIds) || !Array.isArray(departmentIds)) {
+      return res.status(400).json({
+        message: "roleIds and departmentIds should be arrays.",
+      });
     }
 
     // Create the user in the database without hashing the password
@@ -17,38 +26,42 @@ const addUser = async (req, res) => {
       password, // Using the raw password without hashing
     });
 
-    // Assign role to the user
-    const userRole = await user_role.create({
-      userId: newUser.id,
-      roleId: roleId,
-    });
+    // Assign multiple roles to the user
+    const userRoles = await Promise.all(
+      roleIds.map((roleId) =>
+        user_role.create({
+          userId: newUser.id,
+          roleId,
+        })
+      )
+    );
 
-    // Assign department to the user
-    const userDepartment = await user_department.create({
-      userId: newUser.id,
-      departmentId: departmentId,
-    });
+    // Assign multiple departments to the user
+    const userDepartments = await Promise.all(
+      departmentIds.map((departmentId) =>
+        user_department.create({
+          userId: newUser.id,
+          departmentId,
+        })
+      )
+    );
 
     return res.status(201).json({
-      message: 'User created and assigned role and department successfully',
+      message: "User created and assigned roles and departments successfully",
       user: {
         id: newUser.id,
         name: newUser.name,
         email: newUser.email,
       },
-      role: userRole,
-      department: userDepartment,
+      roles: userRoles,
+      departments: userDepartments,
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'An error occurred while creating the user and assigning role/department.' });
+    return res.status(500).json({
+      message: "An error occurred while creating the user and assigning roles/departments.",
+    });
   }
-};
-
-
-// Create User
-const createUser = async (req, res) => {
-  // Similar to addUser, but implement any additional logic here if needed
 };
 
 // Delete User
@@ -87,7 +100,6 @@ const updateUser = async (req, res) => {
 // Export the functions
 module.exports = {
   addUser,
-  createUser,
   deleteUser,
   updateUser,
 };
