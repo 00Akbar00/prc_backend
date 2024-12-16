@@ -6,9 +6,13 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   department.associate = (models) => {
-    // Many-to-Many relationship with User through User_role
-    department.belongsToMany(models.user, { through: models.user_department, foreignKey: 'departmentId' });
+    department.belongsToMany(models.user, {
+      through: models.user_department,
+      foreignKey: 'departmentId',
+      otherKey: 'userId',
+      as: 'users',
+    });
   };
-
+  
   return department;
 };

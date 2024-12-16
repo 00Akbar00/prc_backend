@@ -1,6 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
   const role_permission = sequelize.define('role_permission', {
-    roleId: {type: DataTypes.INTEGER,allowNull: false,
+    roleId: { 
+      type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: 'role', 
         key: 'id',
@@ -12,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Permissions', 
+        model: 'permissions', 
         key: 'id',
       },
       onUpdate: 'CASCADE',
@@ -20,22 +22,8 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     timestamps: true, 
-    tableName: 'role_permission', 
+    tableName: 'role_permission', // Ensure the table name matches the one in the database
   });
-
-  
-  // role_permission.associate = (models) => {
-    
-  //   role_permission.belongsTo(models.Role, {
-  //     foreignKey: 'roleId',
-  //     as: 'role',
-  //   });
-
-  //   role_permission.belongsTo(models.Permission, {
-  //     foreignKey: 'permissionId',
-  //     as: 'permission',
-  //   });
-  // };
 
   return role_permission;
 };

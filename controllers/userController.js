@@ -1,4 +1,34 @@
-const { user, user_role, user_department } = require('../models');
+const { user, user_role, user_department, department, role } = require('../models');
+
+
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await user.findAll({
+      include: [
+        {
+          model: department,
+          as: "departments",  // Ensure this matches your association alias
+          attributes: ["id", "name"],
+          through: { attributes: [] }  // Exclude the join table columns
+        },
+        {
+          model: role,
+          as: "roles",  // Ensure this matches your association alias
+          attributes: ["id", "name"],
+          through: { attributes: [] }  // Exclude the join table columns
+        },
+      ],
+    });
+
+    res.status(200).json({ success: true, users });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
 
 // Add User
 const addUser = async (req, res) => {
@@ -67,9 +97,10 @@ const addUser = async (req, res) => {
 // Delete User
 const deleteUser = async (req, res) => {
   try {
-    const { id } = req.body;
-    const user = await User.destroy({ where: { id } });
-    if (user) {
+    const { id } = req.params;  
+    const deletedUser = await user.destroy({ where: { id } });
+
+    if (deletedUser) {
       res.status(200).json({ message: 'User deleted successfully' });
     } else {
       res.status(404).json({ message: 'User not found' });
@@ -99,6 +130,7 @@ const updateUser = async (req, res) => {
 
 // Export the functions
 module.exports = {
+  getUsers,
   addUser,
   deleteUser,
   updateUser,

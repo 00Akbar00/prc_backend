@@ -21,22 +21,10 @@ module.exports = (sequelize, DataTypes) => {
           },
         }, {
           timestamps: true, 
-          tableName: 'RolePermissions', 
+          tableName: 'user_department', 
         }
     );
 
-    user_department.associate = (models) => {
-        user_department.belongsTo(models.user, {
-          foreignKey: 'userId',
-          as: 'user',
-        });
-        user_department.belongsTo(models.department, {
-          foreignKey: 'departmentId',
-          as: 'department',
-        });
-      };
-    
-  
-    return user_department;
+  return user_department;
 };
   

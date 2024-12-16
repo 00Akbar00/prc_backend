@@ -12,6 +12,7 @@ const router = express.Router();
 
 
 const {
+  getUsers, 
   addUser,
   deleteUser,
   updateUser
@@ -179,9 +180,11 @@ app.post('/addDepartment', addDepartment);
 app.delete('/deleteDepartment/:id', deleteDepartment);
 
 // User Routes
-app.post("/add-user", addUser);       
-app.delete("/delete-user", deleteUser); 
-app.put("/update-user", updateUser);    
+app.get("/Users", getUsers);
+app.post("/addUser", addUser);       
+app.delete("/deleteUser/:id", deleteUser); 
+app.put("/updateUser", updateUser);    
+
 
 
 
