@@ -4,11 +4,14 @@ const passport = require('passport');
 const session = require('express-session');
 const sequelizeSync = require('./config/db');
 const LocalStrategy = require('passport-local').Strategy;
-const { User } = require('./models');  // Import the User model
 require('dotenv').config();
 const PORT = process.env.PORT;
 const cors = require("cors");
 const router = express.Router();
+const { user: CustomUser, role: Role, user_role: UserRole } = require('./models'); // Adjusted model imports
+
+
+
 
 
 const {
@@ -34,7 +37,7 @@ const {
 
 // Middleware
 app.use(express.json());
-const corsOptions = {
+const corsOptions = { 
     origin: 'http://localhost:3000', 
     credentials: true,
 };
@@ -55,75 +58,82 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Passport Local Strategy
-passport.use(new LocalStrategy(
+passport.use(
+  new LocalStrategy(
     { usernameField: 'email', passwordField: 'password' }, // Explicitly define fields
     async (email, password, done) => {
-        try {
-            const user = await User.findOne({ where: { email } });
-
-            if (!user) return done(null, false, { message: 'User not found' });
-
-            // Compare passwords (use a hashed comparison for production)
-            if (user.password !== password) {
-                return done(null, false, { message: 'Invalid password' });
-            }
-
-            return done(null, user);
-        } catch (err) {
-            return done(err);
+      try {
+        const user = await CustomUser.findOne({ where: { email }, include: ['roles'] }); // Include roles
+        if (!user) {
+          return done(null, false, { message: 'User not found' });
         }
-    }
-));
 
-// Serialize and deserialize user to store user data in session
+        // Compare plain-text passwords (replace with proper hashing in production)
+        if (user.password !== password) {
+          return done(null, false, { message: 'Invalid password' });
+        }
+
+        return done(null, user);
+      } catch (err) {
+        return done(err);
+      }
+    }
+  )
+);
+
+// Serialize and Deserialize User
 passport.serializeUser((user, done) => {
-    done(null, user.id);  // Store the user's ID in the session
+  done(null, user.id);
 });
 
 passport.deserializeUser(async (id, done) => {
-    try {
-        const user = await User.findByPk(id);
-        done(null, user);
-    } catch (err) {
-        done(err);
-    }
+  try {
+    const user = await CustomUser.findByPk(id, { include: ['roles'] }); // Include roles
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
 });
 
-// Custom login route
+// Login route
 app.post('/login', (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
+  passport.authenticate('local', async (err, user, info) => {
     if (err) {
-      return next(err);  // Handle any unexpected errors
+      console.error('Authentication Error:', err);
+      return next(err);
     }
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: info?.message || 'Login failed. Please check your credentials.'
+        message: info?.message || 'Login failed. Please check your credentials.',
       });
     }
 
     req.logIn(user, (err) => {
       if (err) {
-        return next(err);  // Handle any login errors
+        console.error('Login Error:', err);
+        return next(err);
       }
 
-      // Determine role based on user's status
-      const role = user.isAdmin ? 'admin' : 'user';
+      // Ensure roles exist and log the roles
+      console.log('User Roles:', user.roles);
 
-      // Set the 'role' cookie (used by middleware)
+      // Check if the user has an 'Admin' role
+      const role = user.roles.some(role => role.name === 'Admin') ? 'Admin' : 'User';
+
+      // Set a cookie for the dashboard role
       res.cookie('dashboard', role, {
-        httpOnly: true,      // Prevent access by client-side JavaScript
-        secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-        sameSite: 'strict',  // Prevent cross-site requests
-        maxAge: 24 * 60 * 60 * 1000  // Cookie expiration: 1 day
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // HTTPS in production
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
       });
 
-      // Send success response with role and other necessary info
       return res.status(200).json({
         success: true,
         message: `Logged in as ${role}`,
-        role: role,   // Return the role variable
-        user: { id: user.id, username: user.username }  // Optionally send user info
+        role,
+        user: { id: user.id, username: user.name },
       });
     });
   })(req, res, next);
