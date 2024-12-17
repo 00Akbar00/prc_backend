@@ -9,8 +9,9 @@ const PORT = process.env.PORT;
 const cors = require("cors");
 const router = express.Router();
 const { user: CustomUser, role: Role, user_role: UserRole } = require('./models'); // Adjusted model imports
-
-
+const bcrypt = require("bcrypt");
+const cookieParser = require('cookie-parser');
+const authorizeByRole = require('./middleware/auth')
 
 
 
@@ -33,7 +34,8 @@ const {
   deleteRole
 } = require('./controllers/roleController');
 
-
+// Enable cookie parsing
+app.use(cookieParser());
 
 // Middleware
 app.use(express.json());
@@ -63,19 +65,21 @@ passport.use(
     { usernameField: 'email', passwordField: 'password' }, // Explicitly define fields
     async (email, password, done) => {
       try {
-        const user = await CustomUser.findOne({ where: { email }, include: ['roles'] }); // Include roles
+        // Find the user by email and include roles
+        const user = await CustomUser.findOne({ where: { email }, include: ['roles'] });
         if (!user) {
           return done(null, false, { message: 'User not found' });
         }
 
-        // Compare plain-text passwords (replace with proper hashing in production)
-        if (user.password !== password) {
+        // Compare the provided password with the hashed password in the database
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
           return done(null, false, { message: 'Invalid password' });
         }
 
-        return done(null, user);
+        return done(null, user); // If passwords match, return the user
       } catch (err) {
-        return done(err);
+        return done(err); // Handle errors
       }
     }
   )
@@ -180,9 +184,9 @@ app.get('/logout', (req, res, next) => {
 
 
 // Role Routes
-app.get('/roles', getRoles);
-app.post('/addRole', addRole);
-app.delete('/deleteRole/:id', deleteRole);
+app.get('/roles', authorizeByRole(['Admin']), getRoles);
+app.post('/addRole', authorizeByRole(['Admin']), addRole);
+app.delete('/deleteRole/:id', authorizeByRole(['Admin']), deleteRole);
 
 // Department Routes
 app.get('/departments', getDepartments);
@@ -190,9 +194,9 @@ app.post('/addDepartment', addDepartment);
 app.delete('/deleteDepartment/:id', deleteDepartment);
 
 // User Routes
-app.get("/Users", getUsers);
-app.post("/addUser", addUser);       
-app.delete("/deleteUser/:id", deleteUser); 
+app.get("/Users", authorizeByRole(['Admin']), getUsers);
+app.post("/addUser", authorizeByRole(['Admin']), addUser);       
+app.delete("/deleteUser/:id", authorizeByRole(['Admin']), deleteUser); 
 app.put("/updateUser", updateUser);    
 
 
