@@ -1,4 +1,5 @@
 const { user, user_role, user_department, department, role } = require('../models');
+const bcrypt = require("bcrypt");
 
 
 
@@ -29,7 +30,6 @@ const getUsers = async (req, res) => {
 };
 
 
-
 // Add User
 const addUser = async (req, res) => {
   try {
@@ -49,11 +49,15 @@ const addUser = async (req, res) => {
       });
     }
 
-    // Create the user in the database without hashing the password
+    // Hash the password using bcrypt
+    const saltRounds = 10; // The cost factor
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create the user in the database with the hashed password
     const newUser = await user.create({
       name,
       email,
-      password, // Using the raw password without hashing
+      password: hashedPassword, // Store the hashed password
     });
 
     // Assign multiple roles to the user
