@@ -118,9 +118,7 @@ app.post('/login', (req, res, next) => {
         console.error('Login Error:', err);
         return next(err);
       }
-
-      // Ensure roles exist and log the roles
-      console.log('User Roles:', user.roles);
+      
 
       // Check if the user has an 'Admin' role
       const role = user.roles.some(role => role.name === 'Admin') ? 'Admin' : 'User';
@@ -184,9 +182,9 @@ app.get('/logout', (req, res, next) => {
 
 
 // Role Routes
-app.get('/roles', authorizeByRole(['Admin']), getRoles);
-app.post('/addRole', authorizeByRole(['Admin']), addRole);
-app.delete('/deleteRole/:id', authorizeByRole(['Admin']), deleteRole);
+app.get('/roles', getRoles);
+app.post('/addRole', addRole);
+app.delete('/deleteRole/:id', deleteRole);
 
 // Department Routes
 app.get('/departments', getDepartments);
@@ -194,9 +192,9 @@ app.post('/addDepartment', addDepartment);
 app.delete('/deleteDepartment/:id', deleteDepartment);
 
 // User Routes
-app.get("/Users", authorizeByRole(['Admin']), getUsers);
-app.post("/addUser", authorizeByRole(['Admin']), addUser);       
-app.delete("/deleteUser/:id", authorizeByRole(['Admin']), deleteUser); 
+app.get("/Users", getUsers);
+app.post("/addUser", addUser);       
+app.delete("/deleteUser/:id", deleteUser); 
 app.put("/updateUser", updateUser);    
 
 
