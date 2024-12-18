@@ -11,9 +11,12 @@ const router = express.Router();
 const { user: CustomUser, role: Role, user_role: UserRole } = require('./models'); // Adjusted model imports
 const bcrypt = require("bcrypt");
 const cookieParser = require('cookie-parser');
-const authorizeByRole = require('./middleware/auth')
 
 
+const {addUserValidation} = require('./middlewares/validations/userValidation')
+const {addRoleValidation} = require('./middlewares/validations/roleValidation')
+const {loginValidation} = require('./middlewares/validations/authValidation')
+const {addDepartmentValidation} = require('./middlewares/validations/departmentValidation')
 
 const {
   getUsers, 
@@ -100,7 +103,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // Login route
-app.post('/login', (req, res, next) => {
+app.post('/login', loginValidation, (req, res, next) => {
   passport.authenticate('local', async (err, user, info) => {
     if (err) {
       console.error('Authentication Error:', err);
@@ -183,17 +186,17 @@ app.get('/logout', (req, res, next) => {
 
 // Role Routes
 app.get('/roles', getRoles);
-app.post('/addRole', addRole);
+app.post('/addRole', addRoleValidation, addRole);
 app.delete('/deleteRole/:id', deleteRole);
 
 // Department Routes
 app.get('/departments', getDepartments);
-app.post('/addDepartment', addDepartment);
+app.post('/addDepartment', addDepartmentValidation, addDepartment);
 app.delete('/deleteDepartment/:id', deleteDepartment);
 
 // User Routes
 app.get("/Users", getUsers);
-app.post("/addUser", addUser);       
+app.post("/addUser", addUserValidation, addUser);       
 app.delete("/deleteUser/:id", deleteUser); 
 app.put("/updateUser", updateUser);    
 
