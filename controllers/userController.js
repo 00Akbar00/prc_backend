@@ -118,7 +118,7 @@ const deleteUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { id, name, email, departmentId, roleId } = req.body;
-    const user = await User.update(
+    const user = await user.update(
       { name, email, departmentId, roleId },
       { where: { id } }
     );
