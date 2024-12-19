@@ -13,7 +13,7 @@ const bcrypt = require("bcrypt");
 const cookieParser = require('cookie-parser');
 
 
-const {addUserValidation} = require('./middlewares/validations/userValidation')
+const {addUserValidation, updateUserValidation} = require('./middlewares/validations/userValidation')
 const {addRoleValidation} = require('./middlewares/validations/roleValidation')
 const {loginValidation} = require('./middlewares/validations/authValidation')
 const {addDepartmentValidation} = require('./middlewares/validations/departmentValidation')
@@ -198,7 +198,7 @@ app.delete('/deleteDepartment/:id', deleteDepartment);
 app.get("/Users", getUsers);
 app.post("/addUser", addUserValidation, addUser);       
 app.delete("/deleteUser/:id", deleteUser); 
-app.put("/updateUser/:id", updateUser);
+app.put("/updateUser/:id",updateUserValidation, updateUser);
     
 
 
