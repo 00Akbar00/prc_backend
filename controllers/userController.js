@@ -114,23 +114,46 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// Update User
 const updateUser = async (req, res) => {
   try {
-    const { id, name, email, departmentId, roleId } = req.body;
-    const user = await user.update(
-      { name, email, departmentId, roleId },
-      { where: { id } }
-    );
-    if (user[0] > 0) {
-      res.status(200).json({ message: 'User updated successfully' });
-    } else {
-      res.status(404).json({ message: 'User not found' });
+    const { id, name, email, departmentIds, roleIds } = req.body;
+
+    // Find the user in the database
+    const userToUpdate = await user.findByPk(id);
+
+    if (!userToUpdate) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    // Update the basic user details
+    await userToUpdate.update({ name, email });
+
+    // Update the associations (assuming Sequelize is used)
+    if (departmentIds) {
+      const departments = await department.findAll({
+        where: { id: departmentIds },
+      });
+      await userToUpdate.setDepartments(departments);
+    }
+
+    if (roleIds) {
+      const roles = await role.findAll({
+        where: { id: roleIds },
+      });
+      await userToUpdate.setRoles(roles);
+    }
+
+    res.status(200).json({ message: "User updated successfully" });
   } catch (error) {
+    console.error("Error updating user:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
+module.exports = { updateUser };
+
 
 // Export the functions
 module.exports = {

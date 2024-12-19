@@ -198,7 +198,8 @@ app.delete('/deleteDepartment/:id', deleteDepartment);
 app.get("/Users", getUsers);
 app.post("/addUser", addUserValidation, addUser);       
 app.delete("/deleteUser/:id", deleteUser); 
-app.put("/updateUser", updateUser);    
+app.put("/updateUser/:id", updateUser);
+    
 
 
 
