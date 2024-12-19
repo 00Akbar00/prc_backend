@@ -1,19 +1,29 @@
-const { role } = require('../models');
+const { role,permission } = require('../models');
 
 const getRoles = async (req, res) => {
   try {
     const roles = await role.findAll({
-      attributes: ['id', 'name'], // Fetch only necessary fields
+      attributes: ['id', 'name',], // Fetch necessary fields from the role table
+      include: [
+        {
+          model: permission,
+          as: 'permissions', // Alias defined in the role model for associated permissions
+          attributes: ['id', 'name',], // Fields to be fetched from the permission table
+          through: { attributes: [] }, // Exclude the intermediate 'role_permission' table fields
+        },
+      ],
     });
+
     res.status(200).json({
       message: 'Roles fetched successfully',
-      roles
+      roles,
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching roles:', error);
     res.status(500).json({ message: 'Failed to fetch roles.' });
   }
 };
+
 
 const addRole = async (req, res) => {
   try {
