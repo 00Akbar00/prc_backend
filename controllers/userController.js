@@ -35,12 +35,12 @@ const addUser = async (req, res) => {
   try {
     const { name, email, password, roleIds, departmentIds } = req.body;
 
-    // Basic validation
-    if (!name || !email || !password || !roleIds || !departmentIds) {
-      return res
-        .status(400)
-        .json({ message: "Name, email, password, roleIds, and departmentIds are required." });
-    }
+    // // Basic validation
+    // if (!name || !email || !password || !roleIds || !departmentIds) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Name, email, password, roleIds, and departmentIds are required." });
+    // }
 
     // Validate roleIds and departmentIds are arrays
     if (!Array.isArray(roleIds) || !Array.isArray(departmentIds)) {

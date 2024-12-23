@@ -37,6 +37,8 @@ const {
   deleteRole
 } = require('./controllers/roleController');
 
+const { getPermissions } = require('./controllers/permissionController');
+
 // Enable cookie parsing
 app.use(cookieParser());
 
@@ -199,6 +201,9 @@ app.get("/Users", getUsers);
 app.post("/addUser", addUserValidation, addUser);       
 app.delete("/deleteUser/:id", deleteUser); 
 app.put("/updateUser/:id",updateUserValidation, updateUser);
+
+// Permission Routes
+app.get('/permissions', getPermissions)
     
 
 
