@@ -34,10 +34,13 @@ const {
 const {
   getRoles,
   addRole,
-  deleteRole
+  deleteRole,
 } = require('./controllers/roleController');
 
-const { getPermissions } = require('./controllers/permissionController');
+const { 
+  getPermissions, 
+  assignPermissionsToRole
+} = require('./controllers/permissionController');
 
 // Enable cookie parsing
 app.use(cookieParser());
@@ -190,6 +193,7 @@ app.get('/logout', (req, res, next) => {
 app.get('/roles', getRoles);
 app.post('/addRole', addRoleValidation, addRole);
 app.delete('/deleteRole/:id', deleteRole);
+app.post('/assign-permissions', assignPermissionsToRole);
 
 // Department Routes
 app.get('/departments', getDepartments);
