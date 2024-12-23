@@ -1,4 +1,4 @@
-const { role,permission } = require('../models');
+const { role,permission, role_permission } = require('../models');
 
 const getRoles = async (req, res) => {
   try {
@@ -84,4 +84,5 @@ const deleteRole = async (req, res) => {
   }
 };
 
-module.exports = { getRoles, addRole, deleteRole }; // Named export
+
+module.exports = { getRoles, addRole, deleteRole,}; // Named export
