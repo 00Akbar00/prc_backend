@@ -2,32 +2,37 @@ const { user, user_role, user_department, department, role } = require('../model
 const bcrypt = require("bcrypt");
 
 
-
 const getUsers = async (req, res) => {
   try {
     const users = await user.findAll({
       include: [
         {
           model: department,
-          as: "departments",  // Ensure this matches your association alias
+          as: "departments", 
           attributes: ["id", "name"],
-          through: { attributes: [] }  // Exclude the join table columns
+          through: { attributes: [] }, 
         },
         {
           model: role,
-          as: "roles",  // Ensure this matches your association alias
+          as: "roles", 
           attributes: ["id", "name"],
-          through: { attributes: [] }  // Exclude the join table columns
+          through: { attributes: [] }, 
         },
       ],
     });
 
-    res.status(200).json({ success: true, users });
+    // Filter out users with the Admin role
+    const filteredUsers = users.filter(
+      (user) => !user.roles.some((role) => role.name === "Admin")
+    );
+
+    res.status(200).json({ success: true, users: filteredUsers });
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
 
 
 // Add User
