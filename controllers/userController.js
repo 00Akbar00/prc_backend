@@ -4,34 +4,89 @@ const bcrypt = require("bcrypt");
 
 const getUsers = async (req, res) => {
   try {
-    const users = await user.findAll({
+    // Get the page and limit from query parameters, with fallback to default values
+    let { page = 1, limit = 10 } = req.query;
+
+    // Ensure that page and limit are numbers and positive
+    page = Math.max(1, parseInt(page)) || 1; // Default to page 1
+    limit = Math.max(1, parseInt(limit)) || 10; // Default to 10 items per page
+
+    // Calculate the offset based on the current page
+    const offset = (page - 1) * limit;
+
+    // Fetch the total number of users to calculate total pages
+    const totalUsers = await user.count({
       include: [
         {
           model: department,
-          as: "departments", 
-          attributes: ["id", "name"],
-          through: { attributes: [] }, 
+          as: 'departments',
+          attributes: ['id', 'name'],
+          through: { attributes: [] },
         },
         {
           model: role,
-          as: "roles", 
-          attributes: ["id", "name"],
-          through: { attributes: [] }, 
+          as: 'roles',
+          attributes: ['id', 'name'],
+          through: { attributes: [] },
         },
       ],
     });
 
-    // Filter out users with the Admin role
-    const filteredUsers = users.filter(
-      (user) => !user.roles.some((role) => role.name === "Admin")
+    // Fetch the users with pagination, including departments and roles
+    const users = await user.findAll({
+      include: [
+        {
+          model: department,
+          as: 'departments',
+          attributes: ['id', 'name'],
+          through: { attributes: [] },
+        },
+        {
+          model: role,
+          as: 'roles',
+          attributes: ['id', 'name'],
+          through: { attributes: [] },
+        },
+      ],
+      limit,  // Use the numeric limit
+      offset,  // Use the numeric offset
+    });
+
+    // Filter out users with the "Admin" role at the database level (if applicable)
+    const filteredUsers = users.filter(user =>
+      !user.roles.some(role => role.name === 'Admin')
     );
 
-    res.status(200).json({ success: true, users: filteredUsers });
+    // Calculate total pages
+    const totalPages = Math.ceil(totalUsers / limit);
+
+    // Determine next and previous pages
+    const hasPreviousPage = page > 1;
+    const hasNextPage = page < totalPages;
+
+    const previousPage = hasPreviousPage ? page - 1 : null;
+    const nextPage = hasNextPage ? page + 1 : null;
+
+    // Send response with pagination details
+    res.status(200).json({
+      success: true,
+      users: filteredUsers,
+      totalUsers,
+      totalPages,
+      currentPage: page,
+      previousPage,
+      nextPage,
+    });
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    console.error('Error fetching users:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+
+
+
+
 
 
 

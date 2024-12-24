@@ -18,6 +18,7 @@ const {addRoleValidation} = require('./middlewares/validations/roleValidation')
 const {loginValidation} = require('./middlewares/validations/authValidation')
 const {addDepartmentValidation} = require('./middlewares/validations/departmentValidation')
 
+
 const {
   getUsers, 
   addUser,
