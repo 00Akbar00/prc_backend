@@ -1,7 +1,6 @@
 const {permission, role, role_permission} = require('../models')
 
-
-const getPermissions = async (req, res) => {
+exports.getPermissions = async (req, res) => {
     try {
     const permissions = await permission.findAll({
        
@@ -14,8 +13,7 @@ const getPermissions = async (req, res) => {
     }
 };
 
-
-const assignPermissionsToRole = async (req, res) => {
+exports.assignPermissionsToRole = async (req, res) => {
     try {
       const { roleId, permissions } = req.body;
   
@@ -73,5 +71,3 @@ const assignPermissionsToRole = async (req, res) => {
       });
     }
   };
-
-module.exports = {getPermissions, assignPermissionsToRole};

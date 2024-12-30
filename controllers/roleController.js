@@ -1,6 +1,6 @@
 const { role,permission, role_permission } = require('../models');
 
-const getRoles = async (req, res) => {
+exports.getRoles = async (req, res) => {
   try {
     const roles = await role.findAll({
       attributes: ['id', 'name',], // Fetch necessary fields from the role table
@@ -24,8 +24,7 @@ const getRoles = async (req, res) => {
   }
 };
 
-
-const addRole = async (req, res) => {
+exports.addRole = async (req, res) => {
   try {
     const { name } = req.body;
 
@@ -53,8 +52,7 @@ const addRole = async (req, res) => {
   }
 };
 
-
-const deleteRole = async (req, res) => {
+exports.deleteRole = async (req, res) => {
   try {
     // Extract the role id from the request parameters
     const { id } = req.params;
@@ -83,6 +81,3 @@ const deleteRole = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete role.' });
   }
 };
-
-
-module.exports = { getRoles, addRole, deleteRole,}; // Named export

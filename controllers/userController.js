@@ -1,8 +1,7 @@
 const { user, user_role, user_department, department, role } = require('../models');
 const bcrypt = require("bcrypt");
 
-
-const getUsers = async (req, res) => {
+exports.getUsers = async (req, res) => {
   try {
     // Get the page and limit from query parameters, with fallback to default values
     let { page = 1, limit = 10 } = req.query;
@@ -83,15 +82,7 @@ const getUsers = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-// Add User
-const addUser = async (req, res) => {
+exports.addUser = async (req, res) => {
   try {
     const { name, email, password, roleIds, departmentIds } = req.body;
 
@@ -158,8 +149,7 @@ const addUser = async (req, res) => {
   }
 };
 
-// Delete User
-const deleteUser = async (req, res) => {
+exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;  
     const deletedUser = await user.destroy({ where: { id } });
@@ -174,7 +164,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const updateUser = async (req, res) => {
+exports.updateUser = async (req, res) => {
   try {
     const { id, name, email, departmentIds, roleIds } = req.body;
 
@@ -208,17 +198,4 @@ const updateUser = async (req, res) => {
     console.error("Error updating user:", error);
     res.status(500).json({ error: error.message });
   }
-};
-
-
-
-module.exports = { updateUser };
-
-
-// Export the functions
-module.exports = {
-  getUsers,
-  addUser,
-  deleteUser,
-  updateUser,
 };
