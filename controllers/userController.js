@@ -1,4 +1,4 @@
-const { user, user_role, user_department, department, role } = require('../models');
+const { user, user_role, user_department, department, role, salary } = require('../models');
 const bcrypt = require("bcrypt");
 
 exports.getUsers = async (req, res) => {
@@ -6,34 +6,24 @@ exports.getUsers = async (req, res) => {
     // Get the page and limit from query parameters, with fallback to default values
     let { page = 1, limit = 10 } = req.query;
 
-    // Ensure that page and limit are numbers and positive
+      // Ensure that page and limit are numbers and positive
     page = Math.max(1, parseInt(page)) || 1; // Default to page 1
     limit = Math.max(1, parseInt(limit)) || 10; // Default to 10 items per page
 
     // Calculate the offset based on the current page
     const offset = (page - 1) * limit;
 
-    // Fetch the total number of users to calculate total pages
-    const totalUsers = await user.count({
-      include: [
-        {
-          model: department,
-          as: 'departments',
-          attributes: ['id', 'name'],
-          through: { attributes: [] },
-        },
-        {
-          model: role,
-          as: 'roles',
-          attributes: ['id', 'name'],
-          through: { attributes: [] },
-        },
-      ],
-    });
+    // Fetch the total number of users for pagination
+    const totalUsers = await user.count();
 
-    // Fetch the users with pagination, including departments and roles
+    // Fetch the users with salary details
     const users = await user.findAll({
       include: [
+        {
+          model: salary,
+          as: 'salaries', // Alias for salary model
+          attributes: ['id', 'basicSalary', 'deductions', 'netSalary', 'month', 'year'],
+        },
         {
           model: department,
           as: 'departments',
@@ -56,17 +46,14 @@ exports.getUsers = async (req, res) => {
       !user.roles.some(role => role.name === 'Admin')
     );
 
-    // Calculate total pages
     const totalPages = Math.ceil(totalUsers / limit);
 
-    // Determine next and previous pages
     const hasPreviousPage = page > 1;
     const hasNextPage = page < totalPages;
 
     const previousPage = hasPreviousPage ? page - 1 : null;
     const nextPage = hasNextPage ? page + 1 : null;
-
-    // Send response with pagination details
+    // Send response with pagination details and user data
     res.status(200).json({
       success: true,
       users: filteredUsers,
@@ -85,13 +72,6 @@ exports.getUsers = async (req, res) => {
 exports.addUser = async (req, res) => {
   try {
     const { name, email, password, roleIds, departmentIds } = req.body;
-
-    // // Basic validation
-    // if (!name || !email || !password || !roleIds || !departmentIds) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Name, email, password, roleIds, and departmentIds are required." });
-    // }
 
     // Validate roleIds and departmentIds are arrays
     if (!Array.isArray(roleIds) || !Array.isArray(departmentIds)) {
