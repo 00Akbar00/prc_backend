@@ -100,13 +100,17 @@ app.post('/login', loginValidation, (req, res, next) => {
         console.error('Login Error:', err);
         return next(err);
       }
-      
 
-      // Check if the user has an 'Admin' role
-      const role = user.roles.some(role => role.name === 'Admin') ? 'Admin' : 'User';
+      // Get the user's roles
+      const roles = user.roles.map(role => role.name);
+      console.log(roles)
+
+      // Define priority for roles if necessary (optional)
+      const rolePriority = ['Admin', 'HR', 'Manager', 'User'];
+      const primaryRole = roles.find(role => rolePriority.includes(role)) || 'User';
 
       // Set a cookie for the dashboard role
-      res.cookie('dashboard', role, {
+      res.cookie('dashboard', primaryRole, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // HTTPS in production
         sameSite: 'strict',
@@ -115,8 +119,9 @@ app.post('/login', loginValidation, (req, res, next) => {
 
       return res.status(200).json({
         success: true,
-        message: `Logged in as ${role}`,
-        role,
+        message: `Logged in as ${primaryRole}`,
+        role: primaryRole,
+        roles,
         user: { id: user.id, username: user.name },
       });
     });
