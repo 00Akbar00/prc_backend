@@ -12,35 +12,9 @@ const { user: CustomUser, role: Role, user_role: UserRole } = require('./models'
 const bcrypt = require("bcrypt");
 const cookieParser = require('cookie-parser');
 
+const apiRoutes = require("./routes")
 
-const {addUserValidation, updateUserValidation} = require('./middlewares/validations/userValidation')
-const {addRoleValidation} = require('./middlewares/validations/roleValidation')
 const {loginValidation} = require('./middlewares/validations/authValidation')
-const {addDepartmentValidation} = require('./middlewares/validations/departmentValidation')
-
-const {
-  getUsers, 
-  addUser,
-  deleteUser,
-  updateUser
-} = require('./controllers/userController');
-
-const {
-  getDepartments,
-  addDepartment,
-  deleteDepartment
-} = require('./controllers/departmentController');
-
-const {
-  getRoles,
-  addRole,
-  deleteRole,
-} = require('./controllers/roleController');
-
-const { 
-  getPermissions, 
-  assignPermissionsToRole
-} = require('./controllers/permissionController');
 
 // Enable cookie parsing
 app.use(cookieParser());
@@ -187,31 +161,8 @@ app.get('/logout', (req, res, next) => {
       res.redirect('/');
   });
 });
-
-
-// Role Routes
-app.get('/roles', getRoles);
-app.post('/addRole', addRoleValidation, addRole);
-app.delete('/deleteRole/:id', deleteRole);
-app.post('/assign-permissions', assignPermissionsToRole);
-
-// Department Routes
-app.get('/departments', getDepartments);
-app.post('/addDepartment', addDepartmentValidation, addDepartment);
-app.delete('/deleteDepartment/:id', deleteDepartment);
-
-// User Routes
-app.get("/Users", getUsers);
-app.post("/addUser", addUserValidation, addUser);       
-app.delete("/deleteUser/:id", deleteUser); 
-app.put("/updateUser/:id",updateUserValidation, updateUser);
-
-// Permission Routes
-app.get('/permissions', getPermissions)
     
-
-
-
+app.use('/api', apiRoutes)
 
 sequelizeSync();
 

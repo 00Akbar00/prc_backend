@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   user.associate = (models) => {
+    user.hasMany(models.salary, {
+      foreignKey: 'userId',
+    });
+    
     user.belongsToMany(models.department, {
       through: models.user_department, // The join table
       foreignKey: 'userId',
@@ -22,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       as: 'roles',
     });
   };
+  
 
   return user;
 };

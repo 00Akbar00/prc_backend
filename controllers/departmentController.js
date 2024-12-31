@@ -1,6 +1,6 @@
 const { user, role, department, user_role, user_department } = require('../models');
 
-const getDepartments = async (req, res) => {
+exports.getDepartments = async (req, res) => {
     try {
       const departments = await department.findAll({
         attributes: ['id', 'name'], // Fetch only necessary fields
@@ -15,7 +15,7 @@ const getDepartments = async (req, res) => {
     }
 };
 
-const addDepartment = async (req, res) => {
+exports.addDepartment = async (req, res) => {
   try {
     const { name } = req.body;
 
@@ -43,8 +43,7 @@ const addDepartment = async (req, res) => {
   }
 };
 
-
-const deleteDepartment = async (req, res) => {
+exports.deleteDepartment = async (req, res) => {
   try {
     // Extract the department id from the request parameters
     const { id } = req.params;
@@ -73,4 +72,3 @@ const deleteDepartment = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete department.' });
   }
 };
-module.exports = {getDepartments, addDepartment, deleteDepartment};
