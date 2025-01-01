@@ -25,7 +25,7 @@ exports.addSalary = async (req, res) => {
   
       // Return success response
       res.status(201).json({
-        message: "Salary added successfully.",
+        message: "Salary slip created successfully",
         salary: newSalary,
       });
     } catch (error) {
