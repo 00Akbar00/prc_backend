@@ -1,8 +1,30 @@
 const { salary } = require('../models');
 
-exports.getSalary = async (res, req) => {
-    
-}
+exports.getSalary = async (req, res) => {
+  try {
+    // Extract userId from the query parameters
+    const userId = req.query.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    // Fetch all salary records for the specific user
+    const salaryRecords = await salary.findAll({ where: { userId: userId } });
+
+    if (salaryRecords.length === 0) {
+      return res.status(404).json({ message: 'No salary records found for the specified user.' });
+    }
+
+    // Send the salary records as the response
+    res.status(200).json(salaryRecords);
+  } catch (error) {
+    console.error('Error fetching salary records:', error);
+    res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+};
+
+
 
 exports.addSalary = async (req, res) => {
     const { basicSalary, deductions, netSalary, month, year, userId } = req.body;
