@@ -4,7 +4,7 @@ const salaryController = require("../controllers/salaryController");
 
 router.get('/getSalary', salaryController.getSalary);
 router.post('/addSalary', salaryController.addSalary);
-router.put('/updateSalary', salaryController.updateSalary)
+router.put('/updateSalary/:id', salaryController.updateSalary);
 router.delete('/deleteSalary/:salaryId', salaryController.deleteSalary);
 
 module.exports = router; 

@@ -32,7 +32,7 @@ exports.addSalary = async (req, res) => {
     // Validate input
     if (!basicSalary || !netSalary || !month || !year || !userId) {
       return res.status(400).json({ message: "All fields are required." });
-    }
+    } 
   
     try {
       // Create new salary entry in the database
@@ -60,9 +60,45 @@ exports.addSalary = async (req, res) => {
     }
 };
 
-exports.updateSalary = async (res, req) => {
-    
-}
+exports.updateSalary = async (req, res) => {
+  try {
+    // Extract salaryId from request parameters and other fields from the request body
+    const { id } = req.params; // Ensure `id` matches the parameter in the route
+    const { basicSalary, deductions, netSalary, month, year, userId } = req.body;
+
+    // Validate input
+    if (!id) {
+      return res.status(400).json({ message: "Salary ID is required." });
+    }
+
+    // Check if the record exists
+    const salaryRecord = await salary.findByPk(id);
+    if (!salaryRecord) {
+      return res.status(404).json({ message: "Salary record not found." });
+    }
+
+    // Update the salary record
+    salaryRecord.basicSalary = basicSalary || salaryRecord.basicSalary;
+    salaryRecord.deductions = deductions || salaryRecord.deductions;
+    salaryRecord.netSalary = netSalary || salaryRecord.netSalary;
+    salaryRecord.month = month || salaryRecord.month;
+    salaryRecord.year = year || salaryRecord.year;
+    salaryRecord.userId = userId || salaryRecord.userId;
+
+    // Save the updated record
+    await salaryRecord.save();
+
+    // Return success response
+    res.status(200).json({
+      message: "Salary record updated successfully.",
+      salary: salaryRecord,
+    });
+  } catch (error) {
+    console.error("Error updating salary record:", error);
+    res.status(500).json({ message: "Internal server error.", error: error.message });
+  }
+};
+
 
 exports.deleteSalary = async (req, res) => {
   try {
