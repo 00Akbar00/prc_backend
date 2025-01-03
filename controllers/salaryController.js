@@ -64,6 +64,29 @@ exports.updateSalary = async (res, req) => {
     
 }
 
-exports.deleteSalary = async (res, req) => {
-    
-}
+exports.deleteSalary = async (req, res) => {
+  try {
+    // Extract salaryId from the request parameters
+    const { salaryId } = req.params;
+
+    if (!salaryId) {
+      return res.status(400).json({ message: 'Salary ID is required.' });
+    }
+
+    // Find the salary record by ID
+    const salaryRecord = await salary.findByPk(salaryId);
+
+    if (!salaryRecord) {
+      return res.status(404).json({ message: 'Salary record not found.' });
+    }
+
+    // Delete the salary record
+    await salaryRecord.destroy();
+
+    // Return success response
+    res.status(200).json({ message: 'Salary record deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting salary record:', error);
+    res.status(500).json({ message: 'Internal server error.', error: error.message });
+  }
+};
